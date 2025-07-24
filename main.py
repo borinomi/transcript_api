@@ -26,3 +26,7 @@ async def get_transcript(data: VideoInput):
 # MCP 등록 (3줄)
 mcp = FastApiMCP(app, name="Transcript MCP", description="Extract subtitles from YouTube videos")
 mcp.mount()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
