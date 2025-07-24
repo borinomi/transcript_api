@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.json
+
+# Virtual environment
+venv/
+
+# macOS
+.DS_Store
+
+# Editor folders
+.vscode/
+.idea/
+
+# 기타
+*.html
+*.md
+*.js
+subtitles/
+smolagents/
