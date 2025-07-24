@@ -7,6 +7,8 @@ print(YouTubeTranscriptApi.fetch)
 
 app = FastAPI()
 
+API_KEY = "my-first-api-key" 
+
 class VideoInput(BaseModel):
     video_id: str
 
