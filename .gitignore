@@ -21,4 +21,9 @@ venv/
 *.md
 *.js
 subtitles/
+smolagents/파이썬코드/
+Python_code/
 smolagents/
+.cursor/
+MCP/
+.env
