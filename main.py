@@ -1,19 +1,31 @@
-from fastapi import FastAPI, HTTPException
-from fastapi_mcp import FastApiMCP
+import os
+import tadata_sdk
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Request  # ✅ Request 추가
 from pydantic import BaseModel
 from youtube_transcript_api import YouTubeTranscriptApi
-print(dir(YouTubeTranscriptApi))
-print(YouTubeTranscriptApi.fetch)
 
-app = FastAPI()
+# 🔒 Swagger UI 및 OpenAPI 비활성화
+app = FastAPI(title="My YT API", version="1.0.0")#, docs_url=None, redoc_url=None, openapi_url=None)
 
+load_dotenv()
 API_KEY = os.getenv("API_KEY")
+YOUR_TADATA_API_KEY = os.getenv("YOUR_TADATA_API_KEY")
+BASE_URL = os.getenv("YOUR_APIS_BASE_URL")
+
+print("expected key:", API_KEY)
 
 class VideoInput(BaseModel):
     video_id: str
 
 @app.post("/get-transcript", operation_id="get_transcript")
-async def get_transcript(data: VideoInput):
+async def get_transcript(data: VideoInput, request: Request):  # ✅ 여기도 request 추가
+    # 🔐 API 키 인증
+    client_key = request.headers.get("x-api-key")
+    print("received key:", client_key)
+    if client_key != API_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden: Invalid API Key")
+
     try:
         api = YouTubeTranscriptApi()
         result = api.fetch(data.video_id, languages=["ko", "en"])
@@ -23,10 +35,10 @@ async def get_transcript(data: VideoInput):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# MCP 등록 (3줄)
-mcp = FastApiMCP(app, name="Transcript MCP", description="Extract subtitles from YouTube videos")
-mcp.mount()
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+# Deploy the FastAPI app directly
+result = tadata_sdk.deploy(
+    fastapi_app=app,
+    api_key=YOUR_TADATA_API_KEY,
+    base_url=BASE_URL,
+    name="My YT API"
+)
